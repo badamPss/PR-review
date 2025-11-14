@@ -28,14 +28,20 @@ type ConnConfig struct {
 }
 
 type SQLConfig struct {
-	ConnConfig   `yaml:"conn_config"`
-	MaxOpenConns int           `yaml:"max_open_conns"`
-	MaxIdleConns int           `yaml:"max_idle_conns"`
-	ConnLifeTime time.Duration `yaml:"conn_life_time"`
+	ConnConfig      `yaml:"conn_config"`
+	MaxOpenConns    int           `yaml:"max_open_conns"`
+	MaxIdleConns    int           `yaml:"max_idle_conns"`
+	ConnLifeTime    time.Duration `yaml:"conn_life_time"`
+	ConnMaxIdleTime time.Duration `yaml:"conn_max_idle_time"`
 }
 
 type DatabaseConfig struct {
 	Postgres SQLConfig `yaml:"postgres"`
+}
+
+type RateLimitConfig struct {
+	Requests int `yaml:"requests"`
+	Burst    int `yaml:"burst"`
 }
 
 type Config struct {
@@ -43,6 +49,7 @@ type Config struct {
 	HTTPServer      HTTPServerConfig `yaml:"http_server"`
 	Database        DatabaseConfig   `yaml:"database"`
 	GracefulTimeout time.Duration    `yaml:"graceful_timeout"`
+	RateLimit       RateLimitConfig  `yaml:"rate_limit"`
 }
 
 func ReadConfig(paths ...string) (*Config, error) {
