@@ -1,0 +1,27 @@
+log:
+  level: "debug"
+  app_id: "pr-review"
+
+http_server:
+  listen: ":8080"
+  read_timeout: 10s
+  write_timeout: 10s
+
+rate_limit:
+  requests: 20
+  burst: 10
+
+databases:
+  postgres:
+    conn_config:
+      network: "tcp"
+      database: "pr_review"
+      host: "postgres"
+      port: 5432
+      username: "postgres"
+      password: "password"
+    max_open_conns: 10
+    max_idle_conns: 5
+    conn_max_idle_time: 5m
+
+graceful_timeout: 20s
