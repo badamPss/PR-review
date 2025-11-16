@@ -5,6 +5,7 @@
 ## Стек и решения
 - Язык: Go
 - БД: PostgreSQL
+- Пользователь принадлежит ровно одной команде: `users.team_id`
 - Миграции: SQL (`db/migration`), применяются при старте контейнером `migrate`
 - HTTP: Echo; соответствие спецификации `openapi.yml`
 
@@ -38,5 +39,22 @@ docker-compose down -v && docker-compose up -d
 - `POST /pullRequest/merge` — отметить PR как MERGED (идемпотентно)
 - `POST /pullRequest/reassign` — переназначить ревьювера на случайного активного из команды заменяемого
 - `GET /users/getReview?user_id=...` — PR’ы, где пользователь назначен ревьювером
+- `GET /stats` — статистика: назначения по пользователям и число ревьюверов по PR
+
+## Пример запроса статистики
+```bash
+curl -s http://localhost:8080/stats | jq
+```
+Ответ:
+```json
+{
+  "by_user": [
+    { "user_id": "u2", "assignments": 3 }
+  ],
+  "per_pr": [
+    { "pull_request_id": "pr-1001", "reviewers_count": 2 }
+  ]
+}
+```
 
 Схема и примеры — в `openapi.yml`.
