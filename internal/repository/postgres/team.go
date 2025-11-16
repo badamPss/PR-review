@@ -14,16 +14,16 @@ import (
 const (
 	selectTeamByIDQuery = `
 		SELECT id, name
-		FROM pr_review.teams
+		FROM pr_review.team
 		WHERE id = $1`
 
 	selectTeamByNameQuery = `
 		SELECT id, name
-		FROM pr_review.teams
+		FROM pr_review.team
 		WHERE name = $1`
 
 	insertTeamQuery = `
-		INSERT INTO pr_review.teams (name)
+		INSERT INTO pr_review.team (name)
 		VALUES ($1)
 		RETURNING id`
 )

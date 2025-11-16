@@ -15,16 +15,16 @@ import (
 const (
 	selectUserByIDQuery = `
 		SELECT id, name, team_id, is_active
-		FROM pr_review.users
+		FROM pr_review.user
 		WHERE id = $1`
 
 	insertUserQuery = `
-		INSERT INTO pr_review.users (id, name, team_id, is_active)
+		INSERT INTO pr_review.user (id, name, team_id, is_active)
 		VALUES ($1, $2, $3, $4)
 		RETURNING id`
 
 	upsertUserQuery = `
-		INSERT INTO pr_review.users (id, name, team_id, is_active)
+		INSERT INTO pr_review.user (id, name, team_id, is_active)
 		VALUES ($1, $2, $3, $4)
 		ON CONFLICT (id) DO UPDATE SET
 			name = EXCLUDED.name,
@@ -34,7 +34,7 @@ const (
 		RETURNING id`
 
 	deactivateUsersByTeamQuery = `
-		UPDATE pr_review.users
+		UPDATE pr_review.user
 		SET is_active = FALSE, updated_at = CURRENT_TIMESTAMP
 		WHERE team_id = $1 AND is_active = TRUE
 		RETURNING id`
@@ -92,7 +92,7 @@ func (r *UserRepository) Update(ctx context.Context, u models.UserUpdate) error 
 	}
 
 	builder := newQueryBuilder().
-		Update("pr_review.users")
+		Update("pr_review.user")
 
 	if u.Name != nil {
 		builder = builder.Set("name", *u.Name)

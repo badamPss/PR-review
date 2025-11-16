@@ -15,7 +15,7 @@ import (
 
 const (
 	insertPullRequestQuery = `
-		INSERT INTO pr_review.pull_requests (
+		INSERT INTO pr_review.pull_request (
 			pull_request_id,
 			title,
 			author_id,
@@ -26,25 +26,25 @@ const (
 
 	selectPullRequestByIDQuery = `
 		SELECT id, pull_request_id, title, author_id, status, reviewers, created_at, merged_at
-		FROM pr_review.pull_requests
+		FROM pr_review.pull_request
 		WHERE id = $1`
 
 	selectPullRequestByStringIDQuery = `
 		SELECT id, pull_request_id, title, author_id, status, reviewers, created_at, merged_at
-		FROM pr_review.pull_requests
+		FROM pr_review.pull_request
 		WHERE pull_request_id = $1`
 
 	selectAssignmentsByUserQuery = `
 		SELECT user_id, COUNT(*) AS assignments
 		FROM (
 			SELECT unnest(reviewers) AS user_id
-			FROM pr_review.pull_requests
+			FROM pr_review.pull_request
 		) t
 		GROUP BY user_id`
 
 	selectAssignmentsPerPRQuery = `
 		SELECT pull_request_id, COALESCE(cardinality(reviewers), 0) AS reviewers_count
-		FROM pr_review.pull_requests`
+		FROM pr_review.pull_request`
 )
 
 type PullRequestRepository struct {
@@ -105,7 +105,7 @@ func (r *PullRequestRepository) Update(ctx context.Context, u models.PullRequest
 	}
 
 	builder := newQueryBuilder().
-		Update("pr_review.pull_requests")
+		Update("pr_review.pull_request")
 
 	if u.PullRequestID != nil {
 		builder = builder.Set("pull_request_id", *u.PullRequestID)
@@ -149,7 +149,7 @@ func (r *PullRequestRepository) Update(ctx context.Context, u models.PullRequest
 func (r *PullRequestRepository) List(ctx context.Context, filter models.ListPullRequestFilter) ([]*models.PullRequest, error) {
 	builder := newQueryBuilder().
 		Select("id", "pull_request_id", "title", "author_id", "status", "reviewers", "created_at", "merged_at").
-		From("pr_review.pull_requests")
+		From("pr_review.pull_request")
 
 	if filter.Status != nil {
 		builder = builder.Where(squirrel.Eq{"status": *filter.Status})

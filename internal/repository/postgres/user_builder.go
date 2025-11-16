@@ -11,7 +11,7 @@ type userSelectBuilder struct {
 func newUserSelectBuilder() *userSelectBuilder {
 	b := newQueryBuilder().
 		Select("id", "name", "team_id", "is_active").
-		From("pr_review.users")
+		From("pr_review.user")
 
 	return &userSelectBuilder{b: b}
 }

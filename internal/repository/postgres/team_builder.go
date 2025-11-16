@@ -13,7 +13,7 @@ type teamSelectBuilder struct {
 func newTeamSelectBuilder() *teamSelectBuilder {
 	b := newQueryBuilder().
 		Select("id", "name").
-		From("pr_review.teams")
+		From("pr_review.team")
 
 	return &teamSelectBuilder{b: b}
 }

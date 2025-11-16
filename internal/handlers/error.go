@@ -4,10 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
-
 	domainerrors "pr-review/internal/errors"
 	"pr-review/internal/handlers/v1/dto"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
