@@ -32,6 +32,7 @@ type UserRepository interface {
 	Update(ctx context.Context, u models.UserUpdate) error
 	Create(ctx context.Context, user *models.User) error
 	Upsert(ctx context.Context, user *models.User) error
+	DeactivateByTeamID(ctx context.Context, teamID int64) ([]string, error)
 }
 
 type TeamRepository interface {
@@ -46,7 +47,7 @@ type PullRequestRepository interface {
 	GetByID(ctx context.Context, id int64) (*models.PullRequest, error)
 	GetByStringID(ctx context.Context, prID string) (*models.PullRequest, error)
 	Update(ctx context.Context, u models.PullRequestUpdate) error
-	ListByReviewer(ctx context.Context, reviewerID string) ([]*models.PullRequest, error)
 	StatsAssignmentsByUser(ctx context.Context) ([]models.UserAssignmentStat, error)
 	StatsReviewersPerPR(ctx context.Context) ([]models.PRReviewersStat, error)
+	List(ctx context.Context, filter models.ListPullRequestFilter) ([]*models.PullRequest, error)
 }

@@ -32,3 +32,11 @@ type PullRequestUpdate struct {
 	Reviewers     *[]string
 	MergedAt      *time.Time
 }
+
+type ListPullRequestFilter struct {
+	Status           *PullRequestStatus
+	ReviewerID       *string
+	ReviewersOverlap *[]string
+	Limit            int
+	Offset           int
+}

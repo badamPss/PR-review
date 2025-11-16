@@ -146,24 +146,39 @@ func (r *PullRequestRepository) Update(ctx context.Context, u models.PullRequest
 	return nil
 }
 
-func (r *PullRequestRepository) ListByReviewer(ctx context.Context, reviewerID string) ([]*models.PullRequest, error) {
-	if reviewerID == "" {
-		return []*models.PullRequest{}, nil
-	}
-
+func (r *PullRequestRepository) List(ctx context.Context, filter models.ListPullRequestFilter) ([]*models.PullRequest, error) {
 	builder := newQueryBuilder().
 		Select("id", "pull_request_id", "title", "author_id", "status", "reviewers", "created_at", "merged_at").
-		From("pr_review.pull_requests").
-		Where(squirrel.Expr("$1 = ANY(reviewers)", reviewerID))
+		From("pr_review.pull_requests")
+
+	if filter.Status != nil {
+		builder = builder.Where(squirrel.Eq{"status": *filter.Status})
+	}
+
+	if filter.ReviewerID != nil && *filter.ReviewerID != "" {
+		builder = builder.Where(squirrel.Expr("? = ANY(reviewers)", *filter.ReviewerID))
+	}
+
+	if filter.ReviewersOverlap != nil && len(*filter.ReviewersOverlap) > 0 {
+		builder = builder.Where(squirrel.Expr("reviewers && ?::text[]", pq.StringArray(*filter.ReviewersOverlap)))
+	}
+
+	if filter.Limit > 0 {
+		builder = builder.Limit(uint64(filter.Limit))
+	}
+
+	if filter.Offset > 0 {
+		builder = builder.Offset(uint64(filter.Offset))
+	}
 
 	query, args, err := builder.ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("build select prs by reviewer query: %w", err)
+		return nil, fmt.Errorf("build list pull requests query: %w", err)
 	}
 
 	var prs []*models.PullRequest
 	if err = r.db.SelectContext(ctx, &prs, query, args...); err != nil {
-		return nil, fmt.Errorf("select prs by reviewer: %w", err)
+		return nil, fmt.Errorf("select pull requests: %w", err)
 	}
 
 	if prs == nil {

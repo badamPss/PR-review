@@ -32,6 +32,12 @@ const (
 			is_active = EXCLUDED.is_active,
 			updated_at = CURRENT_TIMESTAMP
 		RETURNING id`
+
+	deactivateUsersByTeamQuery = `
+		UPDATE pr_review.users
+		SET is_active = FALSE, updated_at = CURRENT_TIMESTAMP
+		WHERE team_id = $1 AND is_active = TRUE
+		RETURNING id`
 )
 
 type UserRepository struct {
@@ -151,4 +157,26 @@ func (r *UserRepository) Upsert(ctx context.Context, user *models.User) error {
 	}
 
 	return nil
+}
+
+func (r *UserRepository) DeactivateByTeamID(ctx context.Context, teamID int64) ([]string, error) {
+	rows, err := r.db.QueryxContext(ctx, deactivateUsersByTeamQuery, teamID)
+	if err != nil {
+		return nil, fmt.Errorf("deactivate users by team: %w", err)
+	}
+	defer rows.Close()
+
+	var ids []string
+	for rows.Next() {
+		var id string
+		if err := rows.Scan(&id); err != nil {
+			return nil, fmt.Errorf("scan deactivated id: %w", err)
+		}
+		ids = append(ids, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return ids, nil
 }

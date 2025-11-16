@@ -20,6 +20,7 @@ type Service interface {
 	CreateTeamWithMembers(ctx context.Context, teamName string, members []dto.TeamMember) (*models.Team, []*models.User, error)
 	GetTeamByName(ctx context.Context, teamName string) (*models.Team, []*models.User, error)
 	GetTeamByID(ctx context.Context, teamID int64) (*models.Team, error)
+	DeactivateTeamAndReassign(ctx context.Context, teamName string) (int, error)
 	CreatePullRequest(ctx context.Context, prID, title, authorIDStr string) (*models.PullRequest, error)
 	MergePullRequest(ctx context.Context, prID string) (*models.PullRequest, error)
 	ReassignReviewer(ctx context.Context, prID, oldUserIDStr string) (*models.PullRequest, string, error)

@@ -67,3 +67,54 @@ func (s *Service) GetTeamByID(ctx context.Context, teamID int64) (*models.Team, 
 	}
 	return team, nil
 }
+
+func (s *Service) DeactivateTeamAndReassign(ctx context.Context, teamName string) (int, error) {
+	team, _, err := s.GetTeamByName(ctx, teamName)
+	if err != nil {
+		return 0, err
+	}
+
+	deactivatedIDs, err := s.userRepo.DeactivateByTeamID(ctx, team.ID)
+	if err != nil {
+		return 0, fmt.Errorf("deactivate users: %w", err)
+	}
+	if len(deactivatedIDs) == 0 {
+		return 0, nil
+	}
+
+	status := models.PRStatusOpen
+	prs, err := s.pullRequestRepo.List(ctx, models.ListPullRequestFilter{
+		Status:           &status,
+		ReviewersOverlap: &deactivatedIDs,
+	})
+	if err != nil {
+		return 0, fmt.Errorf("list impacted prs: %w", err)
+	}
+
+	deactivatedMap := make(map[string]struct{}, len(deactivatedIDs))
+	for _, id := range deactivatedIDs {
+		deactivatedMap[id] = struct{}{}
+	}
+
+	updated := 0
+	for _, pr := range prs {
+		newReviewers := make([]string, 0)
+		for _, reviewerID := range pr.Reviewers {
+			if _, deactivated := deactivatedMap[reviewerID]; !deactivated {
+				newReviewers = append(newReviewers, reviewerID)
+			}
+		}
+
+		if len(newReviewers) < len(pr.Reviewers) {
+			upd := models.PullRequestUpdate{
+				ID:        pr.ID,
+				Reviewers: &newReviewers,
+			}
+			if err := s.pullRequestRepo.Update(ctx, upd); err == nil {
+				updated++
+			}
+		}
+	}
+
+	return updated, nil
+}

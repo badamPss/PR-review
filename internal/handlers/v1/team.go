@@ -11,6 +11,7 @@ import (
 func (a *API) registerTeamHandlers(group *echo.Group) {
 	group.POST("/team/add", a.createTeam)
 	group.GET("/team/get", a.getTeam)
+	group.POST("/team/deactivateMembers", a.deactivateTeamMembers)
 }
 
 func (a *API) createTeam(c echo.Context) error {
@@ -57,5 +58,30 @@ func (a *API) getTeam(c echo.Context) error {
 	return c.JSON(http.StatusOK, dto.TeamResponse{
 		TeamName: team.Name,
 		Members:  teamMembers,
+	})
+}
+
+func (a *API) deactivateTeamMembers(c echo.Context) error {
+	var req dto.DeactivateTeamRequest
+	if err := c.Bind(&req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body")
+	}
+	if err := c.Validate(&req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	if req.TeamName == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "team_name is required")
+	}
+
+	ctx := c.Request().Context()
+	updated, err := a.service.DeactivateTeamAndReassign(ctx, req.TeamName)
+	if err != nil {
+		return handlers.ConvertDomainError(c, err, "deactivate team members")
+	}
+
+	return c.JSON(http.StatusOK, dto.DeactivateTeamResponse{
+		TeamName:         req.TeamName,
+		ReassignedPRsCnt: updated,
 	})
 }

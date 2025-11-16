@@ -27,6 +27,15 @@ type TeamResponse struct {
 	Members  []TeamMember `json:"members"`
 }
 
+type DeactivateTeamRequest struct {
+	TeamName string `json:"team_name" validate:"required"`
+}
+
+type DeactivateTeamResponse struct {
+	TeamName         string `json:"team_name"`
+	ReassignedPRsCnt int    `json:"reassigned_prs_count"`
+}
+
 func ToTeamMembers(users []*models.User) []TeamMember {
 	if len(users) == 0 {
 		return []TeamMember{}

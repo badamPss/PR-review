@@ -28,7 +28,9 @@ func (s *Service) SetUserIsActive(ctx context.Context, userID string, isActive b
 }
 
 func (s *Service) ListUserReviews(ctx context.Context, reviewerIDStr string) ([]*models.PullRequest, error) {
-	prs, err := s.pullRequestRepo.ListByReviewer(ctx, reviewerIDStr)
+	prs, err := s.pullRequestRepo.List(ctx, models.ListPullRequestFilter{
+		ReviewerID: &reviewerIDStr,
+	})
 	if err != nil {
 		return nil, fmt.Errorf("list reviews by reviewer: %w", err)
 	}
