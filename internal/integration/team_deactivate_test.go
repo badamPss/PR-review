@@ -39,4 +39,3 @@ func TestIntegration_Team_Deactivate_RemovesReviewers(t *testing.T) {
 	u3Reviews := doJSON(t, http.MethodGet, "/users/getReview?user_id=deact-u3", "", http.StatusOK)
 	mustContain(t, u3Reviews, `"pull_requests":[]`)
 }
-
