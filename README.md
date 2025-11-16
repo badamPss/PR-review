@@ -95,7 +95,7 @@ make lint
 make test-integration
 ```
 
-Покрытие интеграционными тестами - 70%:
+Покрытие интеграционными тестами - 71%:
 ```bash
 go test -v ./internal/integration \
   -cover -coverpkg=./internal/... \

@@ -120,6 +120,54 @@ components:
         status:
           type: string
           enum: [OPEN, MERGED]
+    DeactivateTeamRequest:
+      type: object
+      required: [team_name]
+      properties:
+        team_name:
+          type: string
+          description: Имя команды для деактивации
+    DeactivateTeamResponse:
+      type: object
+      required: [team_name, reassigned_prs_count]
+      properties:
+        team_name:
+          type: string
+        reassigned_prs_count:
+          type: integer
+          description: Количество обновлённых PR (у которых удалены деактивированные ревьюверы)
+    UserAssignment:
+      type: object
+      required: [user_id, assignments]
+      properties:
+        user_id:
+          type: string
+        assignments:
+          type: integer
+          description: Количество назначений ревьювером
+    PRReviewers:
+      type: object
+      required: [pull_request_id, reviewers_count]
+      properties:
+        pull_request_id:
+          type: string
+        reviewers_count:
+          type: integer
+          description: Количество назначенных ревьюверов
+    StatsResponse:
+      type: object
+      required: [by_user, per_pr]
+      properties:
+        by_user:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserAssignment'
+          description: Статистика назначений по пользователям
+        per_pr:
+          type: array
+          items:
+            $ref: '#/components/schemas/PRReviewers'
+          description: Статистика количества ревьюверов по PR
 
 paths:
   /team/add:
@@ -193,6 +241,34 @@ paths:
                   - user_id: u2
                     username: Bob
                     is_active: true
+        '404':
+          description: Команда не найдена
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /team/deactivateMembers:
+    post:
+      tags: [Teams]
+      summary: Деактивировать всех пользователей команды и удалить их из списка ревьюверов открытых PR
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeactivateTeamRequest'
+            example:
+              team_name: backend
+      responses:
+        '200':
+          description: Команда деактивирована
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeactivateTeamResponse'
+              example:
+                team_name: backend
+                reassigned_prs_count: 1
         '404':
           description: Команда не найдена
           content:
@@ -419,3 +495,26 @@ paths:
                     pull_request_name: Add search
                     author_id: u1
                     status: OPEN
+
+  /stats:
+    get:
+      tags: [PullRequests]
+      summary: Получить статистику назначений ревьюверов
+      responses:
+        '200':
+          description: Статистика назначений
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsResponse'
+              example:
+                by_user:
+                  - user_id: u2
+                    assignments: 3
+                  - user_id: u3
+                    assignments: 2
+                per_pr:
+                  - pull_request_id: pr-1001
+                    reviewers_count: 2
+                  - pull_request_id: pr-1002
+                    reviewers_count: 1
