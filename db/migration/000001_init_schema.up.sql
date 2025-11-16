@@ -28,7 +28,5 @@ CREATE TABLE IF NOT EXISTS pr_review.pull_requests (
 
 CREATE INDEX IF NOT EXISTS idx_users_team_id ON pr_review.users(team_id);
 CREATE INDEX IF NOT EXISTS idx_users_is_active ON pr_review.users(is_active);
-CREATE INDEX IF NOT EXISTS idx_pull_requests_author_id ON pr_review.pull_requests(author_id);
-CREATE INDEX IF NOT EXISTS idx_pull_requests_status ON pr_review.pull_requests(status);
 CREATE INDEX IF NOT EXISTS idx_pull_requests_pull_request_id ON pr_review.pull_requests(pull_request_id);
 
