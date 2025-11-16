@@ -1,7 +1,10 @@
 package models
 
-import "time"
-import "github.com/lib/pq"
+import (
+	"time"
+
+	"github.com/lib/pq"
+)
 
 type PullRequestStatus string
 

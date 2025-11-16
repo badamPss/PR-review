@@ -58,3 +58,11 @@ curl -s http://localhost:8080/stats | jq
 ```
 
 Схема и примеры — в `openapi.yml`.
+
+## Линтер
+В проекте используется `golangci-lint` v2, конфиг — `.golangci.yml`.
+
+Запуск локально (если установлен golangci-lint):
+```bash
+make lint
+```

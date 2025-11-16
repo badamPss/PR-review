@@ -21,5 +21,3 @@ func NewStats(byUser []UserAssignmentStat, perPR []PRReviewersStat) *Stats {
 		PerPR:  perPR,
 	}
 }
-
-

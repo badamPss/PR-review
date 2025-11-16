@@ -8,5 +8,3 @@ type ErrorDetail struct {
 type ErrorResponse struct {
 	Error ErrorDetail `json:"error"`
 }
-
-

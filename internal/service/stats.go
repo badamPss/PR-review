@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"pr-review/internal/models"
 )
 
@@ -10,7 +11,7 @@ func (s *Service) GetStats(ctx context.Context) (*models.Stats, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	perPR, err := s.pullRequestRepo.StatsReviewersPerPR(ctx)
 	if err != nil {
 		return nil, err
@@ -18,5 +19,3 @@ func (s *Service) GetStats(ctx context.Context) (*models.Stats, error) {
 
 	return models.NewStats(byUser, perPR), nil
 }
-
-

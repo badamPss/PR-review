@@ -39,5 +39,3 @@ func FromModelStats(s *models.Stats) StatsResponse {
 	}
 	return out
 }
-
-

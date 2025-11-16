@@ -22,4 +22,3 @@ func NewNotFoundError(msg string) error {
 func NewAlreadyExistsError(msg string) error {
 	return fmt.Errorf("%w: %s", AlreadyExistsError, msg)
 }
-

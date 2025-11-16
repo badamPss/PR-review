@@ -208,7 +208,6 @@ func (r *PullRequestRepository) StatsAssignmentsByUser(ctx context.Context) ([]m
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("rows assignments by user: %w", err)
 	}
-	
 	return out, nil
 }
 

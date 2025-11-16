@@ -1,7 +1,10 @@
 package dto
 
-import "time"
-import "pr-review/internal/models"
+import (
+	"time"
+
+	"pr-review/internal/models"
+)
 
 type CreatePullRequestRequest struct {
 	PullRequestID   string `json:"pull_request_id"`

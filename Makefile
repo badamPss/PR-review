@@ -1,4 +1,4 @@
-.PHONY: build run clean up down logs rebuild ps
+.PHONY: build run clean up down logs rebuild ps lint
 
 BINARY=pr-review
 CMD=./cmd/pr-review
@@ -28,3 +28,7 @@ logs:
 
 ps:
 	docker-compose ps
+
+lint:
+	@golangci-lint --version
+	CGO_ENABLED=0 golangci-lint run -v
