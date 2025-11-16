@@ -42,5 +42,6 @@ func ToTeamMembers(users []*models.User) []TeamMember {
 			IsActive: u.IsActive,
 		})
 	}
+
 	return out
 }

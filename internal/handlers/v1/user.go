@@ -40,12 +40,7 @@ func (a *API) setIsActive(c echo.Context) error {
 		}
 	}
 
-	resp := dto.UserResponse{
-		UserID:   user.ID,
-		Username: user.Name,
-		TeamName: teamName,
-		IsActive: user.IsActive,
-	}
+	resp := dto.FromModelUser(user, teamName)
 
 	return c.JSON(http.StatusOK, map[string]any{
 		"user": resp,
@@ -66,20 +61,7 @@ func (a *API) getUserReviews(c echo.Context) error {
 
 	resp := dto.GetReviewResponse{
 		UserID:       userIDStr,
-		PullRequests: make([]dto.PullRequestShortResponse, 0, len(prs)),
-	}
-
-	for _, pr := range prs {
-		if pr == nil {
-			continue
-		}
-
-		resp.PullRequests = append(resp.PullRequests, dto.PullRequestShortResponse{
-			PullRequestID:   pr.PullRequestID,
-			PullRequestName: pr.Title,
-			AuthorID:        pr.AuthorID,
-			Status:          string(pr.Status),
-		})
+		PullRequests: dto.FromModelPullRequestShortList(prs),
 	}
 
 	return c.JSON(http.StatusOK, resp)

@@ -4,23 +4,19 @@ import (
 	"context"
 	"io"
 	"net/http"
-	"pr-review/internal/handlers"
-
-	"pr-review/internal/service"
-
 	"os"
 	"os/signal"
 	"pr-review/internal/config"
+	"pr-review/internal/handlers"
+	v1 "pr-review/internal/handlers/v1"
 	"pr-review/internal/repository/postgres"
+	"pr-review/internal/service"
 	"syscall"
 
 	"github.com/labstack/echo/v4"
+	echomiddleware "github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"golang.org/x/time/rate"
-
-	v1 "pr-review/internal/handlers/v1"
-
-	echomiddleware "github.com/labstack/echo/v4/middleware"
 )
 
 type App struct {

@@ -33,6 +33,18 @@ const (
 		SELECT id, pull_request_id, title, author_id, status, reviewers, created_at, merged_at
 		FROM pr_review.pull_requests
 		WHERE pull_request_id = $1`
+
+	selectAssignmentsByUserQuery = `
+		SELECT user_id, COUNT(*) AS assignments
+		FROM (
+			SELECT unnest(reviewers) AS user_id
+			FROM pr_review.pull_requests
+		) t
+		GROUP BY user_id`
+
+	selectAssignmentsPerPRQuery = `
+		SELECT pull_request_id, COALESCE(cardinality(reviewers), 0) AS reviewers_count
+		FROM pr_review.pull_requests`
 )
 
 type PullRequestRepository struct {
@@ -172,4 +184,56 @@ func (r *PullRequestRepository) GetByStringID(ctx context.Context, prID string) 
 	}
 
 	return &pr, nil
+}
+
+func (r *PullRequestRepository) StatsAssignmentsByUser(ctx context.Context) ([]models.UserAssignmentStat, error) {
+	rows, err := r.db.QueryxContext(ctx, selectAssignmentsByUserQuery)
+	if err != nil {
+		return nil, fmt.Errorf("select assignments by user: %w", err)
+	}
+	defer rows.Close()
+
+	out := make([]models.UserAssignmentStat, 0)
+	for rows.Next() {
+		var userID string
+		var cnt int64
+		if err := rows.Scan(&userID, &cnt); err != nil {
+			return nil, fmt.Errorf("scan assignments by user: %w", err)
+		}
+		out = append(out, models.UserAssignmentStat{
+			UserID:      userID,
+			Assignments: cnt,
+		})
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows assignments by user: %w", err)
+	}
+	
+	return out, nil
+}
+
+func (r *PullRequestRepository) StatsReviewersPerPR(ctx context.Context) ([]models.PRReviewersStat, error) {
+	rows, err := r.db.QueryxContext(ctx, selectAssignmentsPerPRQuery)
+	if err != nil {
+		return nil, fmt.Errorf("select reviewers per pr: %w", err)
+	}
+	defer rows.Close()
+
+	out := make([]models.PRReviewersStat, 0)
+	for rows.Next() {
+		var prID string
+		var cnt int64
+		if err := rows.Scan(&prID, &cnt); err != nil {
+			return nil, fmt.Errorf("scan reviewers per pr: %w", err)
+		}
+		out = append(out, models.PRReviewersStat{
+			PullRequestID:  prID,
+			ReviewersCount: cnt,
+		})
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows reviewers per pr: %w", err)
+	}
+
+	return out, nil
 }

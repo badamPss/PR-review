@@ -1,5 +1,7 @@
 package dto
 
+import "pr-review/internal/models"
+
 type SetIsActiveRequest struct {
 	UserID   string `json:"user_id" validate:"required"`
 	IsActive bool   `json:"is_active"`
@@ -22,4 +24,13 @@ type PullRequestShortResponse struct {
 type GetReviewResponse struct {
 	UserID       string                     `json:"user_id"`
 	PullRequests []PullRequestShortResponse `json:"pull_requests"`
+}
+
+func FromModelUser(u *models.User, teamName string) UserResponse {
+	return UserResponse{
+		UserID:   u.ID,
+		Username: u.Name,
+		TeamName: teamName,
+		IsActive: u.IsActive,
+	}
 }

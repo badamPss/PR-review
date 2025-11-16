@@ -47,4 +47,6 @@ type PullRequestRepository interface {
 	GetByStringID(ctx context.Context, prID string) (*models.PullRequest, error)
 	Update(ctx context.Context, u models.PullRequestUpdate) error
 	ListByReviewer(ctx context.Context, reviewerID string) ([]*models.PullRequest, error)
+	StatsAssignmentsByUser(ctx context.Context) ([]models.UserAssignmentStat, error)
+	StatsReviewersPerPR(ctx context.Context) ([]models.PRReviewersStat, error)
 }

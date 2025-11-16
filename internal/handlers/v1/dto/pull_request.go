@@ -1,6 +1,7 @@
 package dto
 
 import "time"
+import "pr-review/internal/models"
 
 type CreatePullRequestRequest struct {
 	PullRequestID   string `json:"pull_request_id"`
@@ -35,4 +36,38 @@ type ReassignPullRequestRequest struct {
 type ReassignPullRequestResponse struct {
 	PR         PullRequestResponse `json:"pr"`
 	ReplacedBy string              `json:"replaced_by"`
+}
+
+func FromModelPullRequest(pr *models.PullRequest) PullRequestResponse {
+	reviewers := append([]string(nil), pr.Reviewers...)
+	if reviewers == nil {
+		reviewers = []string{}
+	}
+
+	return PullRequestResponse{
+		PullRequestID:     pr.PullRequestID,
+		PullRequestName:   pr.Title,
+		AuthorID:          pr.AuthorID,
+		Status:            string(pr.Status),
+		AssignedReviewers: reviewers,
+		CreatedAt:         pr.CreatedAt,
+		MergedAt:          pr.MergedAt,
+	}
+}
+
+func FromModelPullRequestShortList(prs []*models.PullRequest) []PullRequestShortResponse {
+	out := make([]PullRequestShortResponse, 0, len(prs))
+	for _, pr := range prs {
+		if pr == nil {
+			continue
+		}
+		out = append(out, PullRequestShortResponse{
+			PullRequestID:   pr.PullRequestID,
+			PullRequestName: pr.Title,
+			AuthorID:        pr.AuthorID,
+			Status:          string(pr.Status),
+		})
+	}
+
+	return out
 }

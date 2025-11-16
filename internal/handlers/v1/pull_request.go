@@ -25,21 +25,8 @@ func (a *API) createPullRequest(c echo.Context) error {
 		return handlers.ConvertDomainError(c, err, "create pull request")
 	}
 
-	reviewers := append([]string(nil), pr.Reviewers...)
-	if reviewers == nil {
-		reviewers = []string{}
-	}
-
 	return c.JSON(http.StatusCreated, map[string]any{
-		"pr": dto.PullRequestResponse{
-			PullRequestID:    pr.PullRequestID,
-			PullRequestName:  pr.Title,
-			AuthorID:         pr.AuthorID,
-			Status:           string(pr.Status),
-			AssignedReviewers: reviewers,
-			CreatedAt:         pr.CreatedAt,
-			MergedAt:          pr.MergedAt,
-		},
+		"pr": dto.FromModelPullRequest(pr),
 	})
 }
 
@@ -59,18 +46,8 @@ func (a *API) mergePullRequest(c echo.Context) error {
 		return handlers.ConvertDomainError(c, err, "merge pull request")
 	}
 
-	reviewers := append([]string(nil), pr.Reviewers...)
-
 	return c.JSON(http.StatusOK, map[string]any{
-		"pr": dto.PullRequestResponse{
-			PullRequestID:    pr.PullRequestID,
-			PullRequestName:  pr.Title,
-			AuthorID:         pr.AuthorID,
-			Status:           string(pr.Status),
-			AssignedReviewers: reviewers,
-			CreatedAt:         pr.CreatedAt,
-			MergedAt:          pr.MergedAt,
-		},
+		"pr": dto.FromModelPullRequest(pr),
 	})
 }
 
@@ -90,18 +67,8 @@ func (a *API) reassignPullRequest(c echo.Context) error {
 		return handlers.ConvertDomainError(c, err, "reassign reviewer")
 	}
 
-	reviewers := append([]string(nil), pr.Reviewers...)
-
 	return c.JSON(http.StatusOK, dto.ReassignPullRequestResponse{
-		PR: dto.PullRequestResponse{
-			PullRequestID:    pr.PullRequestID,
-			PullRequestName:  pr.Title,
-			AuthorID:         pr.AuthorID,
-			Status:           string(pr.Status),
-			AssignedReviewers: reviewers,
-			CreatedAt:         pr.CreatedAt,
-			MergedAt:          pr.MergedAt,
-		},
+		PR:         dto.FromModelPullRequest(pr),
 		ReplacedBy: newReviewerID,
 	})
 }

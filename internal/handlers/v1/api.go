@@ -2,7 +2,6 @@ package v1
 
 import (
 	"context"
-
 	"pr-review/internal/config"
 	"pr-review/internal/handlers/v1/dto"
 	"pr-review/internal/models"
@@ -25,6 +24,7 @@ type Service interface {
 	MergePullRequest(ctx context.Context, prID string) (*models.PullRequest, error)
 	ReassignReviewer(ctx context.Context, prID, oldUserIDStr string) (*models.PullRequest, string, error)
 	GetPullRequestByStringID(ctx context.Context, prID string) (*models.PullRequest, error)
+	GetStats(ctx context.Context) (*models.Stats, error)
 }
 type API struct {
 	service Service
@@ -48,6 +48,7 @@ func (a *API) RegisterHandlers(g *echo.Group) {
 	a.registerTeamHandlers(api)
 	a.registerPullRequestHandlers(api)
 	a.registerUserHandlers(api)
+	a.registerStatsHandlers(api)
 }
 
 type Validator struct {
