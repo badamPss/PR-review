@@ -4,10 +4,14 @@ import (
 	"context"
 	"io"
 	"net/http"
+	"pr-review/internal/handlers"
+
+	"pr-review/internal/service"
 
 	"os"
 	"os/signal"
 	"pr-review/internal/config"
+	"pr-review/internal/repository/postgres"
 	"syscall"
 
 	"github.com/labstack/echo/v4"
@@ -36,11 +40,28 @@ func New(configPath string) *App {
 		log.Fatalf("failed to init database: %v", err)
 	}
 
-	// TODO: make repos
+	userRepo := postgres.NewUserRepository(db)
+	pullRequestRepo := postgres.NewPullRequestRepository(db)
+	teamRepo := postgres.NewTeamRepository(db)
+
+	svc, err := service.NewService(&service.Config{
+		UserRepo:        userRepo,
+		PullRequestRepo: pullRequestRepo,
+		TeamRepo:        teamRepo,
+	})
+
+	if err != nil {
+		log.Fatalf("failed to init service: %v", err)
+	}
 
 	e := newEcho(cfg)
 
-	// TODO: register handlers
+	handlers.Register(
+		e,
+		v1.NewHandlers(v1.APIConfig{
+			Service: svc,
+			Cfg:     *cfg,
+		}))
 
 	return &App{
 		cfg:     cfg,

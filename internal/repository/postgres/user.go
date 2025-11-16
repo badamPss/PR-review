@@ -17,6 +17,21 @@ const (
 		SELECT id, name, team_id, is_active
 		FROM pr_review.users
 		WHERE id = $1`
+
+	insertUserQuery = `
+		INSERT INTO pr_review.users (id, name, team_id, is_active)
+		VALUES ($1, $2, $3, $4)
+		RETURNING id`
+
+	upsertUserQuery = `
+		INSERT INTO pr_review.users (id, name, team_id, is_active)
+		VALUES ($1, $2, $3, $4)
+		ON CONFLICT (id) DO UPDATE SET
+			name = EXCLUDED.name,
+			team_id = EXCLUDED.team_id,
+			is_active = EXCLUDED.is_active,
+			updated_at = CURRENT_TIMESTAMP
+		RETURNING id`
 )
 
 type UserRepository struct {
@@ -27,12 +42,12 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-func (r *UserRepository) GetByID(ctx context.Context, userID int64) (*models.User, error) {
+func (r *UserRepository) GetByID(ctx context.Context, userID string) (*models.User, error) {
 	var user models.User
 
 	if err := r.db.GetContext(ctx, &user, selectUserByIDQuery, userID); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("user with id %d not found", userID)
+			return nil, fmt.Errorf("user with id %s not found", userID)
 		}
 		return nil, fmt.Errorf("get user by id: %w", err)
 	}
@@ -66,7 +81,7 @@ func (r *UserRepository) List(ctx context.Context, filter models.ListUserFilter)
 }
 
 func (r *UserRepository) Update(ctx context.Context, u models.UserUpdate) error {
-	if u.ID == 0 {
+	if u.ID == "" {
 		return fmt.Errorf("user id is required for update")
 	}
 
@@ -100,7 +115,39 @@ func (r *UserRepository) Update(ctx context.Context, u models.UserUpdate) error 
 		return fmt.Errorf("get rows affected: %w", err)
 	}
 	if rows == 0 {
-		return fmt.Errorf("user with id %d not found", u.ID)
+		return fmt.Errorf("user with id %s not found", u.ID)
+	}
+
+	return nil
+}
+
+func (r *UserRepository) Create(ctx context.Context, user *models.User) error {
+	if user == nil {
+		return fmt.Errorf("user cannot be nil")
+	}
+
+	if user.ID == "" {
+		return fmt.Errorf("user id is required")
+	}
+
+	if err := r.db.QueryRowxContext(ctx, insertUserQuery, user.ID, user.Name, user.TeamID, user.IsActive).Scan(&user.ID); err != nil {
+		return fmt.Errorf("insert user: %w", err)
+	}
+
+	return nil
+}
+
+func (r *UserRepository) Upsert(ctx context.Context, user *models.User) error {
+	if user == nil {
+		return fmt.Errorf("user cannot be nil")
+	}
+
+	if user.ID == "" {
+		return r.Create(ctx, user)
+	}
+
+	if err := r.db.QueryRowxContext(ctx, upsertUserQuery, user.ID, user.Name, user.TeamID, user.IsActive).Scan(&user.ID); err != nil {
+		return fmt.Errorf("upsert user: %w", err)
 	}
 
 	return nil

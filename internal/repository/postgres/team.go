@@ -17,6 +17,11 @@ const (
 		FROM pr_review.teams
 		WHERE id = $1`
 
+	selectTeamByNameQuery = `
+		SELECT id, name
+		FROM pr_review.teams
+		WHERE name = $1`
+
 	insertTeamQuery = `
 		INSERT INTO pr_review.teams (name)
 		VALUES ($1)
@@ -51,6 +56,19 @@ func (r *TeamRepository) GetByID(ctx context.Context, teamID int64) (*models.Tea
 			return nil, fmt.Errorf("team with id %d not found", teamID)
 		}
 		return nil, fmt.Errorf("get team by id: %w", err)
+	}
+
+	return &team, nil
+}
+
+func (r *TeamRepository) GetByName(ctx context.Context, name string) (*models.Team, error) {
+	var team models.Team
+
+	if err := r.db.GetContext(ctx, &team, selectTeamByNameQuery, name); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("team with name %s not found", name)
+		}
+		return nil, fmt.Errorf("get team by name: %w", err)
 	}
 
 	return &team, nil

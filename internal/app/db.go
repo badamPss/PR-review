@@ -5,12 +5,13 @@ import (
 
 	"pr-review/internal/config"
 
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 )
 
 func initDB(cfg config.SQLConfig) (*sqlx.DB, error) {
 	dataSource := fmt.Sprintf(
-		"host=%s user=%s password=%s database=%s port=%s sslmode=disable target_session_attrs=read-write statement_cache_mode=describe",
+		"host=%s user=%s password=%s database=%s port=%d sslmode=disable",
 		cfg.Host,
 		cfg.Username,
 		cfg.Password,

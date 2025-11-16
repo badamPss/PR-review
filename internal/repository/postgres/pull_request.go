@@ -16,18 +16,23 @@ import (
 const (
 	insertPullRequestQuery = `
 		INSERT INTO pr_review.pull_requests (
+			pull_request_id,
 			title,
 			author_id,
 			status,
-			reviewers,
-			need_more_reviewers
+			reviewers
 		) VALUES ($1, $2, $3, $4, $5)
 		RETURNING id`
 
 	selectPullRequestByIDQuery = `
-		SELECT id, title, author_id, status, reviewers, need_more_reviewers
+		SELECT id, pull_request_id, title, author_id, status, reviewers, created_at, merged_at
 		FROM pr_review.pull_requests
 		WHERE id = $1`
+
+	selectPullRequestByStringIDQuery = `
+		SELECT id, pull_request_id, title, author_id, status, reviewers, created_at, merged_at
+		FROM pr_review.pull_requests
+		WHERE pull_request_id = $1`
 )
 
 type PullRequestRepository struct {
@@ -52,11 +57,11 @@ func (r *PullRequestRepository) Create(ctx context.Context, pr *models.PullReque
 	err = tx.QueryRowxContext(
 		ctx,
 		insertPullRequestQuery,
+		pr.PullRequestID,
 		pr.Title,
 		pr.AuthorID,
 		pr.Status,
-		pq.Int64Array(pr.Reviewers),
-		pr.NeedMore,
+		pr.Reviewers,
 	).Scan(&pr.ID)
 	if err != nil {
 		return fmt.Errorf("insert pull request: %w", err)
@@ -90,6 +95,9 @@ func (r *PullRequestRepository) Update(ctx context.Context, u models.PullRequest
 	builder := newQueryBuilder().
 		Update("pr_review.pull_requests")
 
+	if u.PullRequestID != nil {
+		builder = builder.Set("pull_request_id", *u.PullRequestID)
+	}
 	if u.Title != nil {
 		builder = builder.Set("title", *u.Title)
 	}
@@ -97,10 +105,10 @@ func (r *PullRequestRepository) Update(ctx context.Context, u models.PullRequest
 		builder = builder.Set("status", *u.Status)
 	}
 	if u.Reviewers != nil {
-		builder = builder.Set("reviewers", pq.Int64Array(*u.Reviewers))
+		builder = builder.Set("reviewers", pq.StringArray(*u.Reviewers))
 	}
-	if u.NeedMore != nil {
-		builder = builder.Set("need_more_reviewers", *u.NeedMore)
+	if u.MergedAt != nil {
+		builder = builder.Set("merged_at", *u.MergedAt)
 	}
 
 	builder = builder.Where(squirrel.Eq{"id": u.ID})
@@ -126,13 +134,13 @@ func (r *PullRequestRepository) Update(ctx context.Context, u models.PullRequest
 	return nil
 }
 
-func (r *PullRequestRepository) ListByReviewer(ctx context.Context, reviewerID int64) ([]*models.PullRequest, error) {
-	if reviewerID == 0 {
+func (r *PullRequestRepository) ListByReviewer(ctx context.Context, reviewerID string) ([]*models.PullRequest, error) {
+	if reviewerID == "" {
 		return []*models.PullRequest{}, nil
 	}
 
 	builder := newQueryBuilder().
-		Select("id", "title", "author_id", "status", "reviewers", "need_more_reviewers").
+		Select("id", "pull_request_id", "title", "author_id", "status", "reviewers", "created_at", "merged_at").
 		From("pr_review.pull_requests").
 		Where(squirrel.Expr("$1 = ANY(reviewers)", reviewerID))
 
@@ -151,4 +159,17 @@ func (r *PullRequestRepository) ListByReviewer(ctx context.Context, reviewerID i
 	}
 
 	return prs, nil
+}
+
+func (r *PullRequestRepository) GetByStringID(ctx context.Context, prID string) (*models.PullRequest, error) {
+	var pr models.PullRequest
+
+	if err := r.db.GetContext(ctx, &pr, selectPullRequestByStringIDQuery, prID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("pull request with id %s not found", prID)
+		}
+		return nil, fmt.Errorf("get pull request by string id: %w", err)
+	}
+
+	return &pr, nil
 }

@@ -16,7 +16,7 @@ func newUserSelectBuilder() *userSelectBuilder {
 	return &userSelectBuilder{b: b}
 }
 
-func (u *userSelectBuilder) WhereIDs(ids []int64) *userSelectBuilder {
+func (u *userSelectBuilder) WhereIDs(ids []string) *userSelectBuilder {
 	if len(ids) > 0 {
 		u.b = u.b.Where(squirrel.Eq{"id": ids})
 	}

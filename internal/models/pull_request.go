@@ -1,5 +1,8 @@
 package models
 
+import "time"
+import "github.com/lib/pq"
+
 type PullRequestStatus string
 
 const (
@@ -8,18 +11,21 @@ const (
 )
 
 type PullRequest struct {
-	ID        int64             `db:"id"`
-	Title     string            `db:"title"`
-	AuthorID  int64             `db:"author_id"`
-	Status    PullRequestStatus `db:"status"`
-	Reviewers []int64           `db:"reviewers"`
-	NeedMore  bool              `db:"need_more_reviewers"`
+	ID            int64             `db:"id"`
+	PullRequestID string            `db:"pull_request_id"`
+	Title         string            `db:"title"`
+	AuthorID      string            `db:"author_id"`
+	Status        PullRequestStatus `db:"status"`
+	Reviewers     pq.StringArray    `db:"reviewers"`
+	CreatedAt     *time.Time        `db:"created_at"`
+	MergedAt      *time.Time        `db:"merged_at"`
 }
 
 type PullRequestUpdate struct {
-	ID        int64
-	Title     *string
-	Status    *PullRequestStatus
-	Reviewers *[]int64
-	NeedMore  *bool
+	ID            int64
+	PullRequestID *string
+	Title         *string
+	Status        *PullRequestStatus
+	Reviewers     *[]string
+	MergedAt      *time.Time
 }

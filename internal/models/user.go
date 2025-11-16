@@ -1,23 +1,23 @@
 package models
 
 type User struct {
-	ID       int64  `db:"id"`
+	ID       string `db:"id"`
 	Name     string `db:"name"`
 	TeamID   int64  `db:"team_id"`
 	IsActive bool   `db:"is_active"`
 }
 
+type UserUpdate struct {
+	ID       string
+	Name     *string
+	TeamID   *int64
+	IsActive *bool
+}
+
 type ListUserFilter struct {
-	IDs      []int64
+	IDs      []string
 	TeamID   *int64
 	IsActive *bool
 	Limit    int
 	Offset   int
-}
-
-type UserUpdate struct {
-	ID       int64
-	Name     *string
-	TeamID   *int64
-	IsActive *bool
 }
