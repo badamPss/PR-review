@@ -1,4 +1,4 @@
-.PHONY: build run clean up down logs rebuild ps lint
+.PHONY: build run clean up down logs rebuild ps lint test-integration
 
 BINARY=pr-review
 CMD=./cmd/pr-review
@@ -32,3 +32,6 @@ ps:
 lint:
 	@golangci-lint --version
 	CGO_ENABLED=0 golangci-lint run -v
+
+test-integration:
+	go test ./internal/integration -v

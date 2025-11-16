@@ -66,3 +66,18 @@ curl -s http://localhost:8080/stats | jq
 ```bash
 make lint
 ```
+
+## Интеграционные тесты
+Интеграционные тесты находятся в `internal/integration`: сервис поднимается в памяти (httptest) с реальной PostgreSQL через testcontainers.
+
+Запуск:
+```bash
+make test-integration
+```
+
+Покрытие интеграционными тестами - 70%:
+```bash
+go test -v ./internal/integration \
+  -cover -coverpkg=./internal/... \
+  -coverprofile=it.cover
+```
