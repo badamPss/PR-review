@@ -35,3 +35,6 @@ lint:
 
 test-integration:
 	go test ./internal/integration -v
+
+load-test:
+	./scripts/load_test.sh

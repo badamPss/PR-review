@@ -1,0 +1,10 @@
+Complete requests:      250
+Successful requests:         71
+Failed requests:             179
+Requests per second:         62.50 [#/sec] (mean)
+Time per request:            16.000 [ms] (mean)
+Time per request (p50):      16.000 [ms]
+Time per request (p95):      24.000 [ms]
+Time per request (p99):      32.000 [ms]
+Total time:                  4.0 [s]
+

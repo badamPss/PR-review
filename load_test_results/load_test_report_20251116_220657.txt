@@ -1,0 +1,86 @@
+Load Test Report - Sun Nov 16 22:06:57 MSK 2025
+==========================================
+
+=== GET /stats ===
+
+Complete requests:      250
+Failed requests:        239
+Requests per second:    3889.05 [#/sec] (mean)
+Time per request:       1.286 [ms] (mean)
+Time per request:       0.257 [ms] (mean, across all concurrent requests)
+Transfer rate:          2841.86 [Kbytes/sec] received
+
+=== GET /users/getReview ===
+
+Complete requests:      250
+Failed requests:        1
+Requests per second:    6137.98 [#/sec] (mean)
+Time per request:       0.815 [ms] (mean)
+Time per request:       0.163 [ms] (mean, across all concurrent requests)
+Transfer rate:          943.71 [Kbytes/sec] received
+
+=== GET /team/get ===
+
+Complete requests:      250
+Failed requests:        1
+Requests per second:    6792.74 [#/sec] (mean)
+Time per request:       0.736 [ms] (mean)
+Time per request:       0.147 [ms] (mean, across all concurrent requests)
+Transfer rate:          1046.48 [Kbytes/sec] received
+
+=== POST /team/add ===
+
+Complete requests:      250
+Failed requests:        1
+Requests per second:    6914.67 [#/sec] (mean)
+Time per request:       0.723 [ms] (mean)
+Time per request:       0.145 [ms] (mean, across all concurrent requests)
+Transfer rate:          1060.97 [Kbytes/sec] received
+
+=== POST /team/deactivateMembers ===
+
+Complete requests:      250
+Failed requests:        1
+Requests per second:    5628.86 [#/sec] (mean)
+Time per request:       0.888 [ms] (mean)
+Time per request:       0.178 [ms] (mean, across all concurrent requests)
+Transfer rate:          863.17 [Kbytes/sec] received
+
+=== POST /users/setIsActive ===
+
+Complete requests:      250
+Failed requests:        239
+Requests per second:    4402.26 [#/sec] (mean)
+Time per request:       1.136 [ms] (mean)
+Time per request:       0.227 [ms] (mean, across all concurrent requests)
+Transfer rate:          685.17 [Kbytes/sec] received
+
+=== POST /pullRequest/merge ===
+
+Complete requests:      250
+Failed requests:        0
+Requests per second:    7406.31 [#/sec] (mean)
+Time per request:       0.675 [ms] (mean)
+Time per request:       0.135 [ms] (mean, across all concurrent requests)
+Transfer rate:          1135.54 [Kbytes/sec] received
+
+=== POST /pullRequest/reassign ===
+
+Complete requests:      250
+Failed requests:        249
+Requests per second:    6671.83 [#/sec] (mean)
+Time per request:       0.749 [ms] (mean)
+Time per request:       0.150 [ms] (mean, across all concurrent requests)
+Transfer rate:          1023.94 [Kbytes/sec] received
+
+=== POST /pullRequest/create ===
+
+Complete requests:      250
+Successful requests:    71
+Failed requests:        179
+Requests per second:    62.50 [#/sec] (mean)
+Time per request:       16.000 [ms] (mean)
+Time per request (p50): 16.000 [ms]
+Time per request (p95): 24.000 [ms]
+Time per request (p99): 32.000 [ms]
+
