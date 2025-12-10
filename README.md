@@ -1,4 +1,4 @@
-# PR Reviewer Assignment Service (Test Task, Fall 2025)
+# PR Reviewer Assignment Service
 
 Короткий README по запуску и проверке сервиса, реализующего автоматическое назначение ревьюверов и управление командами/пользователями.
 
